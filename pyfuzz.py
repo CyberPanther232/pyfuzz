@@ -7,7 +7,7 @@ Purpose: To assist ethical hacking (penetration testing) in web application expl
 import argparse
 import requests
 
-def run_requests(url, method, wordlist, status = "*"):
+def run_requests(url, method, wordlist, status = "*", output=""):
     method = method.upper()
 
     with open(wordlist, 'r') as words:
@@ -31,10 +31,14 @@ def run_requests(url, method, wordlist, status = "*"):
                 if status == "*":
                 # Print status and response text
                     print(f"Status Code: {response.status_code} | Fuzzed URL: {fuzz_url}")
+                    if output != "":
+                        open(output, 'a').write(f'Status Code: {response.status_code} | Fuzzed URL: {fuzz_url}\n')
 
                 elif status != "*":
                     if response.status_code == int(status):
                         print(f"Status Code: {response.status_code} | Fuzzed URL: {fuzz_url}")
+                        if output != "":
+                            open(output, 'a').write(f'Status Code: {response.status_code} | Fuzzed URL: {fuzz_url}\n')
                     else:
                         pass
                 
@@ -53,10 +57,11 @@ def main():
     parser.add_argument('-r', '--request', help='Type of HTTP request method (POST, GET, PUT, HEAD)', required=True)
     parser.add_argument('-w', '--wordlist', help='Wordlist for fuzzing', required=True)
     parser.add_argument('-s', '--status', help="Filters the status based on whatever code you provide. (No filter by default)")
+    parser.add_argument('-o', '--output', help="Outputs results to a the file specified")
     
     args = parser.parse_args()
     
-    run_requests(url=args.url, method=args.request, wordlist=args.wordlist, status=args.status)
+    run_requests(url=args.url, method=args.request, wordlist=args.wordlist, status=args.status, output=args.output)
     
 if __name__ == "__main__":
     main()
